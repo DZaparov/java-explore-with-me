@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class StatsServiceImpl implements StatsService{
+public class StatsServiceImpl implements StatsService {
     private final StatsRepository statsRepository;
 
     public StatsServiceImpl(StatsRepository statsRepository) {
@@ -26,16 +26,13 @@ public class StatsServiceImpl implements StatsService{
         if (unique) {
             if (!uris.isEmpty()) {
                 return statsRepository.findAllUniqueByTimestampBetweenAndUriIn(start, end, uris);
-            }
-            else {
+            } else {
                 return statsRepository.findAllUniqueByTimestampBetween(start, end);
             }
-        }
-        else {
+        } else {
             if (!uris.isEmpty()) {
                 return statsRepository.findAllByTimestampBetweenAndUriIn(start, end, uris);
-            }
-            else {
+            } else {
                 return statsRepository.findAllByTimestampBetween(start, end);
             }
         }
