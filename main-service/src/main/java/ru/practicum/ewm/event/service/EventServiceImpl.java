@@ -376,7 +376,7 @@ public class EventServiceImpl implements EventService {
         Page<Event> events = eventRepository.findAll(predicate, page);
 
         List<String> eventIds = new ArrayList<>();
-        for(Event event : events) {
+        for (Event event : events) {
             eventIds.add("/event/" + event.getId());
         }
 
