@@ -375,10 +375,15 @@ public class EventServiceImpl implements EventService {
 
         Page<Event> events = eventRepository.findAll(predicate, page);
 
+        List<String> eventIds = new ArrayList<>();
+        for(Event event : events) {
+            eventIds.add("/event/" + event.getId());
+        }
+
         ResponseEntity<Object> responseEntity = statsClient.getViewStats(
-                findEarliestDate(events.toList()),
-                LocalDateTime.now(),
-                Collections.singletonList(request.getRequestURI()),
+                rangeStart != null ? rangeStart : findEarliestDate(events.toList()),
+                rangeEnd != null ? rangeEnd : LocalDateTime.now(),
+                eventIds,
                 true);
 
         ObjectMapper mapper = new ObjectMapper();
@@ -421,6 +426,7 @@ public class EventServiceImpl implements EventService {
                     LocalDateTime.now(),
                     Collections.singletonList(request.getRequestURI()),
                     true);
+
 
             ObjectMapper mapper = new ObjectMapper();
             List<ViewStats> viewStatsList = mapper.convertValue(

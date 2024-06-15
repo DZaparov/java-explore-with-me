@@ -35,7 +35,7 @@ public class StatsController {
                                     @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
                                     @RequestParam(required = false) List<String> uris,
                                     @RequestParam(defaultValue = "false") boolean unique) {
-        log.info("Получение статистики по посещениям");
+        log.info("Получение статистики по посещениям start={}, end={}, uris={}, unique={}", start, end, uris, unique);
         if (uris == null) {
             uris = new ArrayList<>();
         }

@@ -31,10 +31,6 @@ public class StatsServiceImpl implements StatsService {
             throw new RequestDateException("Дата конца раньше, чем дата начала");
         }
 
-        if (end.isEqual(start)) {
-            throw new RequestDateException("Дата конца совпадает с датой начала");
-        }
-
         if (unique) {
             if (!uris.isEmpty()) {
                 return statsRepository.findAllUniqueByTimestampBetweenAndUriIn(start, end, uris);
