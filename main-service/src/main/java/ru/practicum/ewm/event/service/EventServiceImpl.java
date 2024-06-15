@@ -469,7 +469,7 @@ public class EventServiceImpl implements EventService {
 
     public LocalDateTime findEarliestDate(List<Event> events) {
         return events.stream()
-                .map(Event::getEventDate)
+                .map(Event::getCreatedOn)
                 .min(LocalDateTime::compareTo)
                 .orElse(null);
     }
