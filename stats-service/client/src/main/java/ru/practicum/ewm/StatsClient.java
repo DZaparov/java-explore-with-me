@@ -6,10 +6,11 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -25,8 +26,7 @@ public class StatsClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> createHit(HttpServletRequest request) {
-        EndpointHit hit = new EndpointHit();
+    public ResponseEntity<Object> createHit(@RequestBody EndpointHit hit) {
         return post("/hit", hit);
     }
 
@@ -34,9 +34,13 @@ public class StatsClient extends BaseClient {
                                                LocalDateTime end,
                                                List<String> uris,
                                                Boolean unique) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedStart = formatter.format(start);
+        String formattedEnd = formatter.format(end);
+
         Map<String, Object> parameters = Map.of(
-                "start", start,
-                "end", end,
+                "start", formattedStart,
+                "end", formattedEnd,
                 "uris", String.join(",", uris),
                 "unique", unique
         );
