@@ -4,9 +4,9 @@ import lombok.*;
 
 import javax.persistence.*;
 
-@Data
+@Getter
+@Setter
 @ToString
-@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -17,4 +17,16 @@ public class Category {
     private Long id;
     @Column
     private String name;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Category)) return false;
+        return id != null && id.equals(((Category) o).getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

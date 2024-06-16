@@ -5,9 +5,9 @@ import lombok.*;
 
 import javax.persistence.*;
 
-@Data
+@Getter
+@Setter
 @ToString
-@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -21,4 +21,16 @@ public class Location {
     private float lat;
     @Column
     private float lon;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Location)) return false;
+        return id != null && id.equals(((Location) o).getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

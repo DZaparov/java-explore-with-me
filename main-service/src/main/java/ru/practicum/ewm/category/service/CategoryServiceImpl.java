@@ -87,10 +87,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     private Category applyChecks(Long catId) {
-        if (catId != null) {
-            return categoryRepository.findById(catId).orElseThrow(() ->
-                    new NotFoundException("Category with id=" + catId + " was not found"));
-        }
-        return null;
+        return categoryRepository.findById(catId).orElseThrow(() ->
+                new NotFoundException("Category with id=" + catId + " was not found"));
     }
 }

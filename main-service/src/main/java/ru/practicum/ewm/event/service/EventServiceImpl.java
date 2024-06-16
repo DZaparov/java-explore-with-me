@@ -24,7 +24,6 @@ import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.user.UserRepository;
 import ru.practicum.ewm.user.model.User;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -53,7 +52,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventShortDto> listUsersEvents(Long userId, int from, int size) {
-        checkAdnGetUser(userId);
+        checkAndGetUser(userId);
 
         PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size);
 
@@ -67,8 +66,8 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
-        User user = checkAdnGetUser(userId);
-        Category category = checkAdnGetCategory(newEventDto.getCategory());
+        User user = checkAndGetUser(userId);
+        Category category = checkAndGetCategory(newEventDto.getCategory());
 
         if (newEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
             throw new ConflictException(
@@ -83,7 +82,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto listUsersEventFull(Long userId, Long eventId) {
-        User user = checkAdnGetUser(userId);
+        User user = checkAndGetUser(userId);
 
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId).orElseThrow(() ->
                 new NotFoundException("Event with id=" + eventId + " was not found"));
@@ -93,11 +92,11 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto updateEvent(Long userId, Long eventId, UpdateEventUserRequest updateEventUserRequest) {
-        checkAdnGetUser(userId);
+        checkAndGetUser(userId);
 
         Category category = null;
         if (updateEventUserRequest.getCategory() != null) {
-            category = checkAdnGetCategory(updateEventUserRequest.getCategory());
+            category = checkAndGetCategory(updateEventUserRequest.getCategory());
         }
 
         Event updatedEvent = eventRepository.findByIdAndInitiatorId(eventId, userId).orElseThrow(() ->
@@ -135,8 +134,8 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<ParticipationRequestDto> listUsersEventRequests(Long userId, Long eventId) {
-        checkAdnGetUser(userId);
-        checkAdnGetEvent(eventId);
+        checkAndGetUser(userId);
+        checkAndGetEvent(eventId);
 
         List<ParticipationRequest> participationRequest =
                 participationRequestRepository.findByEventId(eventId);
@@ -153,10 +152,10 @@ public class EventServiceImpl implements EventService {
             Long userId,
             Long eventId,
             EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
-        checkAdnGetUser(userId);
-        checkAdnGetEvent(eventId);
+        checkAndGetUser(userId);
+        checkAndGetEvent(eventId);
 
-        Event event = checkAdnGetEvent(eventId);
+        Event event = checkAndGetEvent(eventId);
         List<ParticipationRequest> confirmedRequests = new ArrayList<>();
         List<ParticipationRequest> rejectedRequests = new ArrayList<>();
 
@@ -272,15 +271,15 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto updateEventAdmin(Long eventId, UpdateEventAdminRequest updateEventAdminRequest) {
-        checkAdnGetEvent(eventId);
+        checkAndGetEvent(eventId);
 
         Category category = null;
 
         if (updateEventAdminRequest.getCategory() != null) {
-            category = checkAdnGetCategory(updateEventAdminRequest.getCategory());
+            category = checkAndGetCategory(updateEventAdminRequest.getCategory());
         }
 
-        Event updatedEvent = checkAdnGetEvent(eventId);
+        Event updatedEvent = checkAndGetEvent(eventId);
 
         EventState state = EventState.PENDING;
 
@@ -321,13 +320,8 @@ public class EventServiceImpl implements EventService {
     public List<EventShortDto> listEventsPublicFilter(String text, List<Long> categoryIds, Boolean paid,
                                                       LocalDateTime rangeStart, LocalDateTime rangeEnd,
                                                       Boolean onlyAvailable, String sort, int from, int size,
-                                                      HttpServletRequest request) {
-        statsClient.createHit(EndpointHit.builder()
-                .app("ewm-main-service")
-                .uri(request.getRequestURI())
-                .ip(request.getRemoteAddr())
-                .timestamp(LocalDateTime.now())
-                .build());
+                                                      String uri, String ip) {
+        createHit(uri, ip);
 
         Sort sorting = Sort.by(Sort.Order.asc("id"));
 
@@ -380,17 +374,11 @@ public class EventServiceImpl implements EventService {
             eventIds.add("/event/" + event.getId());
         }
 
-        ResponseEntity<Object> responseEntity = statsClient.getViewStats(
+        List<ViewStats> viewStatsList = getViewStats(
                 rangeStart != null ? rangeStart : findEarliestDate(events.toList()),
                 rangeEnd != null ? rangeEnd : LocalDateTime.now(),
-                eventIds,
-                true);
-
-        ObjectMapper mapper = new ObjectMapper();
-        List<ViewStats> viewStatsList = mapper.convertValue(
-                responseEntity.getBody(),
-                new TypeReference<List<ViewStats>>() {
-                });
+                eventIds
+        );
 
         Map<Long, Long> eventIdHits = new HashMap<>();
 
@@ -409,30 +397,18 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventFullDto getEventPublicFull(Long eventId, HttpServletRequest request) {
-        Event event = checkAdnGetEvent(eventId);
+    public EventFullDto getEventPublicFull(Long eventId, String uri, String ip) {
+        Event event = checkAndGetEvent(eventId);
 
         if (event.getState().equals(EventState.PUBLISHED)) {
 
-            statsClient.createHit(EndpointHit.builder()
-                    .app("ewm-main-service")
-                    .uri(request.getRequestURI())
-                    .ip(request.getRemoteAddr())
-                    .timestamp(LocalDateTime.now())
-                    .build());
+            createHit(uri, ip);
 
-            ResponseEntity<Object> responseEntity = statsClient.getViewStats(
+            List<ViewStats> viewStatsList = getViewStats(
                     event.getCreatedOn(),
                     LocalDateTime.now(),
-                    Collections.singletonList(request.getRequestURI()),
-                    true);
-
-
-            ObjectMapper mapper = new ObjectMapper();
-            List<ViewStats> viewStatsList = mapper.convertValue(
-                    responseEntity.getBody(),
-                    new TypeReference<List<ViewStats>>() {
-                    });
+                    Collections.singletonList(uri)
+            );
 
             event.setViews(viewStatsList.get(0).getHits());
 
@@ -443,34 +419,48 @@ public class EventServiceImpl implements EventService {
 
     }
 
-    private User checkAdnGetUser(Long userId) {
-        if (userId != null) {
-            return userRepository.findById(userId).orElseThrow(() ->
-                    new NotFoundException("User with id=" + userId + " was not found"));
-        }
-        return null;
+    private User checkAndGetUser(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundException("User with id=" + userId + " was not found"));
     }
 
-    private Event checkAdnGetEvent(Long eventId) {
-        if (eventId != null) {
-            return eventRepository.findById(eventId).orElseThrow(() ->
-                    new NotFoundException("Event with id=" + eventId + " was not found"));
-        }
-        return null;
+    private Event checkAndGetEvent(Long eventId) {
+        return eventRepository.findById(eventId).orElseThrow(() ->
+                new NotFoundException("Event with id=" + eventId + " was not found"));
     }
 
-    private Category checkAdnGetCategory(Long categoryId) {
-        if (categoryId != null) {
-            return categoryRepository.findById(categoryId).orElseThrow(() ->
-                    new NotFoundException("Category with id=" + categoryId + " was not found"));
-        }
-        return null;
+    private Category checkAndGetCategory(Long categoryId) {
+        return categoryRepository.findById(categoryId).orElseThrow(() ->
+                new NotFoundException("Category with id=" + categoryId + " was not found"));
     }
 
-    public LocalDateTime findEarliestDate(List<Event> events) {
+    private LocalDateTime findEarliestDate(List<Event> events) {
         return events.stream()
                 .map(Event::getCreatedOn)
                 .min(LocalDateTime::compareTo)
                 .orElse(null);
+    }
+
+    private void createHit(String uri, String ip) {
+        statsClient.createHit(EndpointHit.builder()
+                .app("ewm-main-service")
+                .uri(uri)
+                .ip(ip)
+                .timestamp(LocalDateTime.now())
+                .build());
+    }
+
+    private List<ViewStats> getViewStats(LocalDateTime rangeStart, LocalDateTime rangeEnd, List<String> eventIds) {
+        ResponseEntity<Object> responseEntity = statsClient.getViewStats(
+                rangeStart,
+                rangeEnd,
+                eventIds,
+                true);
+
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.convertValue(
+                responseEntity.getBody(),
+                new TypeReference<List<ViewStats>>() {
+                });
     }
 }

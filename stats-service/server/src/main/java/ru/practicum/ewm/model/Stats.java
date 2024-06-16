@@ -1,15 +1,13 @@
 package ru.practicum.ewm.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,4 +26,16 @@ public class Stats {
     @Column
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Stats)) return false;
+        return id != null && id.equals(((Stats) o).getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

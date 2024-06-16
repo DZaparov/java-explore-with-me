@@ -86,10 +86,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     private Compilation checkAndGetCompilation(Long compId) {
-        if (compId != null) {
-            return compilationRepository.findById(compId).orElseThrow(() ->
-                    new NotFoundException("Compilation with id=" + compId + " was not found"));
-        }
-        return null;
+        return compilationRepository.findById(compId).orElseThrow(() ->
+                new NotFoundException("Compilation with id=" + compId + " was not found"));
     }
 }

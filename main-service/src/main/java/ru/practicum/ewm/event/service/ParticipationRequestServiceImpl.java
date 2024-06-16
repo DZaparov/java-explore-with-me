@@ -109,10 +109,8 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
                 participationRequestRepository.save(participationRequest));
     }
 
-    private void applyChecks(Long userId) {
-        if (userId != null) {
-            User user = userRepository.findById(userId).orElseThrow(() ->
-                    new NotFoundException("User with id=" + userId + " was not found"));
-        }
+    private User applyChecks(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundException("User with id=" + userId + " was not found"));
     }
 }

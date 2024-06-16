@@ -43,7 +43,8 @@ public class EventPublicController {
                 text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size, request);
 
         List<EventShortDto> result = eventService.listEventsPublicFilter(
-                text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size, request);
+                text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size,
+                request.getRequestURI(), request.getRemoteAddr());
 
         log.info("Получен список событий: {}", result);
 
@@ -54,7 +55,7 @@ public class EventPublicController {
     public EventFullDto getEventPublicFull(@PathVariable Long id, HttpServletRequest request) {
         log.info("Попытка получения полной информации об опубликованном событии id={}, request:{}", id, request);
 
-        EventFullDto result = eventService.getEventPublicFull(id, request);
+        EventFullDto result = eventService.getEventPublicFull(id, request.getRequestURI(), request.getRemoteAddr());
 
         log.info("Получено событие: {}", result);
 

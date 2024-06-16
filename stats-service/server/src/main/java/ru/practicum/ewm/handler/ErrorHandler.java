@@ -24,4 +24,17 @@ public class ErrorHandler {
                 .timestamp(LocalDateTime.now().toString())
                 .build();
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR) //500
+    public ApiError handleThrowable(final Throwable e) {
+        log.info("{} {}", HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        return ApiError.builder()
+                .errors(e.toString())
+                .message(e.getMessage())
+                .reason("The server encountered an unexpected condition.")
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.toString())
+                .timestamp(LocalDateTime.now().toString())
+                .build();
+    }
 }

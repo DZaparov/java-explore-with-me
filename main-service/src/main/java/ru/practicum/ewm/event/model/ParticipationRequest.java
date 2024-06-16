@@ -6,9 +6,9 @@ import ru.practicum.ewm.user.model.User;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @ToString
-@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -33,4 +33,16 @@ public class ParticipationRequest {
     @Column
     @Enumerated(EnumType.STRING)
     private ParticipationRequestStatus status;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ParticipationRequest)) return false;
+        return id != null && id.equals(((ParticipationRequest) o).getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

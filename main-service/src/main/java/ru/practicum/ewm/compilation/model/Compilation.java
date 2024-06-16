@@ -6,9 +6,9 @@ import ru.practicum.ewm.event.model.Event;
 import javax.persistence.*;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @ToString
-@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -32,4 +32,16 @@ public class Compilation {
 
     @Column
     private Boolean pinned;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Compilation)) return false;
+        return id != null && id.equals(((Compilation) o).getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

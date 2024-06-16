@@ -3,7 +3,6 @@ package ru.practicum.ewm.event.service;
 import ru.practicum.ewm.event.dto.*;
 import ru.practicum.ewm.event.model.EventState;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -31,7 +30,7 @@ public interface EventService {
     List<EventShortDto> listEventsPublicFilter(String text, List<Long> categories, Boolean paid,
                                                LocalDateTime rangeStart, LocalDateTime rangeEnd,
                                                Boolean onlyAvailable, String sort, int from, int size,
-                                               HttpServletRequest request);
+                                               String uri, String ip);
 
-    EventFullDto getEventPublicFull(Long eventId, HttpServletRequest request);
+    EventFullDto getEventPublicFull(Long eventId, String uri, String ip);
 }

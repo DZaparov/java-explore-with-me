@@ -4,9 +4,9 @@ import lombok.*;
 
 import javax.persistence.*;
 
-@Data
+@Getter
+@Setter
 @ToString
-@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -19,4 +19,16 @@ public class User {
     private String name;
     @Column
     private String email;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        return id != null && id.equals(((User) o).getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }
