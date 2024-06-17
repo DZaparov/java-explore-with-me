@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 public interface StatsRepository extends JpaRepository<Stats, Long> {
-    @Query("SELECT new ru.practicum.ewm.ViewStats(s.app, s.uri, COUNT(DISTINCT s.uri)) " +
+    @Query("SELECT new ru.practicum.ewm.ViewStats(s.app, s.uri, COUNT(DISTINCT s.ip)) " +
             "FROM Stats s " +
             "WHERE s.timestamp >= ?1 AND s.timestamp <= ?2 " +
             "AND s.uri in ?3 " +
@@ -20,7 +20,7 @@ public interface StatsRepository extends JpaRepository<Stats, Long> {
     List<ViewStats> findAllUniqueByTimestampBetweenAndUriIn(
             LocalDateTime start, LocalDateTime end, List<String> uris);
 
-    @Query("SELECT new ru.practicum.ewm.ViewStats(s.app, s.uri, COUNT(s.uri)) " +
+    @Query("SELECT new ru.practicum.ewm.ViewStats(s.app, s.uri, COUNT(s.ip)) " +
             "FROM Stats s " +
             "WHERE s.timestamp >= ?1 AND s.timestamp <= ?2 " +
             "AND s.uri in ?3 " +
@@ -29,7 +29,7 @@ public interface StatsRepository extends JpaRepository<Stats, Long> {
     List<ViewStats> findAllByTimestampBetweenAndUriIn(
             LocalDateTime start, LocalDateTime end, List<String> uris);
 
-    @Query("SELECT new ru.practicum.ewm.ViewStats(s.app, s.uri, COUNT(DISTINCT s.uri)) " +
+    @Query("SELECT new ru.practicum.ewm.ViewStats(s.app, s.uri, COUNT(DISTINCT s.ip)) " +
             "FROM Stats s " +
             "WHERE s.timestamp >= ?1 AND s.timestamp <= ?2 " +
             "GROUP BY s.app, s.uri " +
@@ -37,7 +37,7 @@ public interface StatsRepository extends JpaRepository<Stats, Long> {
     List<ViewStats> findAllUniqueByTimestampBetween(
             LocalDateTime start, LocalDateTime end);
 
-    @Query("SELECT new ru.practicum.ewm.ViewStats(s.app, s.uri, COUNT(s.uri)) " +
+    @Query("SELECT new ru.practicum.ewm.ViewStats(s.app, s.uri, COUNT(s.ip)) " +
             "FROM Stats s " +
             "WHERE s.timestamp >= ?1 AND s.timestamp <= ?2 " +
             "GROUP BY s.app, s.uri " +

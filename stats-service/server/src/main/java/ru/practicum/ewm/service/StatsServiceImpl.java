@@ -3,6 +3,7 @@ package ru.practicum.ewm.service;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.EndpointHit;
 import ru.practicum.ewm.ViewStats;
+import ru.practicum.ewm.exception.RequestDateException;
 import ru.practicum.ewm.model.Stats;
 import ru.practicum.ewm.model.StatsMapper;
 import ru.practicum.ewm.repository.StatsRepository;
@@ -26,6 +27,10 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public List<ViewStats> getViewStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
+        if (end.isBefore(start)) {
+            throw new RequestDateException("Дата конца раньше, чем дата начала");
+        }
+
         if (unique) {
             if (!uris.isEmpty()) {
                 return statsRepository.findAllUniqueByTimestampBetweenAndUriIn(start, end, uris);
