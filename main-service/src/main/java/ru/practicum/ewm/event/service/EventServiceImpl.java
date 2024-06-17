@@ -15,6 +15,7 @@ import ru.practicum.ewm.StatsClient;
 import ru.practicum.ewm.ViewStats;
 import ru.practicum.ewm.category.CategoryRepository;
 import ru.practicum.ewm.category.model.Category;
+import ru.practicum.ewm.event.CommentRepository;
 import ru.practicum.ewm.event.EventRepository;
 import ru.practicum.ewm.event.ParticipationRequestRepository;
 import ru.practicum.ewm.event.dto.*;
@@ -36,17 +37,20 @@ public class EventServiceImpl implements EventService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final ParticipationRequestRepository participationRequestRepository;
+    private final CommentRepository commentRepository;
     public final StatsClient statsClient;
 
     public EventServiceImpl(EventRepository eventRepository,
                             UserRepository userRepository,
                             CategoryRepository categoryRepository,
                             ParticipationRequestRepository participationRequestRepository,
+                            CommentRepository commentRepository,
                             StatsClient statsClient) {
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.participationRequestRepository = participationRequestRepository;
+        this.commentRepository = commentRepository;
         this.statsClient = statsClient;
     }
 
@@ -87,7 +91,12 @@ public class EventServiceImpl implements EventService {
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId).orElseThrow(() ->
                 new NotFoundException("Event with id=" + eventId + " was not found"));
 
-        return EventMapper.toEventFullDto(event);
+        List<CommentDto> comments = commentRepository.findAllCommentByEventId(eventId)
+                .stream()
+                .map(CommentMapper::toCommentDto)
+                .collect(Collectors.toList());
+
+        return EventMapper.toEventFullDto(event, comments);
     }
 
     @Override
@@ -412,11 +421,81 @@ public class EventServiceImpl implements EventService {
 
             event.setViews(viewStatsList.get(0).getHits());
 
-            return EventMapper.toEventFullDto(event);
+            List<CommentDto> comments = commentRepository.findAllCommentByEventId(eventId)
+                    .stream()
+                    .map(CommentMapper::toCommentDto)
+                    .collect(Collectors.toList());
+
+            return EventMapper.toEventFullDto(event, comments);
         } else {
             throw new NotFoundException("You cannot look at an unpublished event");
         }
 
+    }
+
+    @Override
+    public CommentDto addComment(NewCommentDto newCommentDto, Long userId, Long eventId) {
+        User user = checkAndGetUser(userId);
+        Event event = checkAndGetEvent(eventId);
+
+        if (!event.getState().equals(EventState.PUBLISHED)) {
+            throw new ConflictException("Only published events allowed to comment");
+        }
+        Comment comment = CommentMapper.toComment(newCommentDto, event, user);
+        comment.setCreated(LocalDateTime.now());
+
+        return CommentMapper.toCommentDto(commentRepository.save(comment));
+    }
+
+    @Override
+    public void deleteComment(Long userId, Long eventId, Long commentId) {
+        User user = checkAndGetUser(userId);
+        Event event = checkAndGetEvent(eventId);
+        Comment comment = checkAndGetComment(commentId);
+
+        //комментарий может удалить только автор
+        if (!userId.equals(comment.getAuthor().getId())) {
+            throw new ConflictException("Comment can be deleted only by author");
+        }
+
+        //нельзя удалить комментарий у отмененного события
+        if (event.getState().equals(EventState.CANCELED)) {
+            throw new ConflictException("Comment can be deleted only for pending or published events");
+        }
+        commentRepository.deleteById(commentId);
+    }
+
+    @Override
+    public CommentDto updateComment(UpdateCommentRequest updateCommentRequest,
+                                    Long userId, Long eventId, Long commentId) {
+        User user = checkAndGetUser(userId);
+        Event event = checkAndGetEvent(eventId);
+
+        Comment existingComment = commentRepository.findById(commentId).orElseThrow(() ->
+                new NotFoundException("Comment with id=" + eventId + " was not found"));
+
+        Comment comment = CommentMapper.toComment(updateCommentRequest, existingComment);
+
+        if (!userId.equals(existingComment.getAuthor().getId())) {
+            throw new ConflictException("Comment can be changed only by author");
+        }
+
+        return CommentMapper.toCommentDto(commentRepository.save(comment));
+    }
+
+    @Override
+    public void deleteCommentByAdmin(Long eventId, Long commentId) {
+        Event event = checkAndGetEvent(eventId);
+        Comment comment = checkAndGetComment(commentId);
+
+        commentRepository.deleteById(commentId);
+    }
+
+    @Override
+    public CommentDto getCommentById(Long commentId) {
+        Comment comment = checkAndGetComment(commentId);
+
+        return CommentMapper.toCommentDto(comment);
     }
 
     private User checkAndGetUser(Long userId) {
@@ -432,6 +511,11 @@ public class EventServiceImpl implements EventService {
     private Category checkAndGetCategory(Long categoryId) {
         return categoryRepository.findById(categoryId).orElseThrow(() ->
                 new NotFoundException("Category with id=" + categoryId + " was not found"));
+    }
+
+    private Comment checkAndGetComment(Long commentId) {
+        return commentRepository.findById(commentId).orElseThrow(() ->
+                new NotFoundException("Comment with id=" + commentId + " was not found"));
     }
 
     private LocalDateTime findEarliestDate(List<Event> events) {

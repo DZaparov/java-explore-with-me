@@ -96,4 +96,42 @@ public class EventPrivateController {
 
         return result;
     }
+
+    @PostMapping("/{eventId}/comment")
+    @ResponseStatus(code = HttpStatus.CREATED) //201
+    public CommentDto addComment(@Valid @RequestBody NewCommentDto newCommentDto,
+                                 @PathVariable Long userId,
+                                 @PathVariable Long eventId) {
+        return eventService.addComment(newCommentDto, userId, eventId);
+    }
+
+    @DeleteMapping("/{eventId}/comment/{commentId}")
+    @ResponseStatus(code = HttpStatus.NO_CONTENT) //204
+    public void deleteComment(@PathVariable Long userId,
+                              @PathVariable Long eventId,
+                              @PathVariable Long commentId) {
+        eventService.deleteComment(userId, eventId, commentId);
+    }
+
+    @PatchMapping("/{eventId}/comment/{commentId}")
+    @ResponseStatus(code = HttpStatus.OK) //200
+    public CommentDto updateComment(@Valid @RequestBody UpdateCommentRequest updateCommentRequest,
+                                    @PathVariable Long userId,
+                                    @PathVariable Long eventId,
+                                    @PathVariable Long commentId) {
+        log.info("Попытка обновить комментарий с id={} на {}", commentId, updateCommentRequest);
+        CommentDto result = eventService.updateComment(updateCommentRequest, userId, eventId, commentId);
+        log.info("Обновлен комментарий: {}", result);
+
+        return result;
+    }
+
+    @GetMapping("/{eventId}/comment/{commentId}")
+    public CommentDto getCommentById(@PathVariable Long commentId) {
+        log.info("Попытка получения комментария id=: {}", commentId);
+        CommentDto result = eventService.getCommentById(commentId);
+        log.info("Комментарий получен: {}", result);
+
+        return result;
+    }
 }

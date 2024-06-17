@@ -8,6 +8,7 @@ import ru.practicum.ewm.user.dto.UserMapper;
 import ru.practicum.ewm.user.model.User;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class EventMapper {
     public static EventFullDto toEventFullDto(Event event) {
@@ -28,6 +29,28 @@ public class EventMapper {
                 .paid(event.isPaid())
                 .requestModeration(event.isRequestModeration())
                 .views(event.getViews())
+                .build();
+    }
+
+    public static EventFullDto toEventFullDto(Event event, List<CommentDto> commentList) {
+        return EventFullDto.builder()
+                .id(event.getId())
+                .title(event.getTitle())
+                .description(event.getDescription())
+                .annotation(event.getAnnotation())
+                .category(CategoryMapper.toCategoryDto(event.getCategory()))
+                .createdOn(event.getCreatedOn())
+                .publishedOn(event.getPublishedOn())
+                .eventDate(event.getEventDate())
+                .initiator(UserMapper.toUserShortDto(event.getInitiator()))
+                .location(event.getLocation())
+                .state(event.getState())
+                .participantLimit(event.getParticipantLimit())
+                .confirmedRequests(event.getConfirmedRequests())
+                .paid(event.isPaid())
+                .requestModeration(event.isRequestModeration())
+                .views(event.getViews())
+                .comments(commentList)
                 .build();
     }
 

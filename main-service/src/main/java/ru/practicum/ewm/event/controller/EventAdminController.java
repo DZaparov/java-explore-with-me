@@ -2,6 +2,7 @@ package ru.practicum.ewm.event.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.event.dto.EventFullDto;
@@ -56,5 +57,12 @@ public class EventAdminController {
         log.info("Измененное событие: {}", result);
 
         return result;
+    }
+
+    @DeleteMapping("/{eventId}/comment/{commentId}")
+    @ResponseStatus(code = HttpStatus.NO_CONTENT) //204
+    public void deleteCommentByAdmin(@PathVariable Long eventId,
+                                     @PathVariable Long commentId) {
+        eventService.deleteCommentByAdmin(eventId, commentId);
     }
 }

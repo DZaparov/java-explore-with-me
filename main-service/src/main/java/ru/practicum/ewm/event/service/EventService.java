@@ -33,4 +33,14 @@ public interface EventService {
                                                String uri, String ip);
 
     EventFullDto getEventPublicFull(Long eventId, String uri, String ip);
+
+    CommentDto addComment(NewCommentDto newCommentDto, Long userId, Long eventId);
+
+    void deleteComment(Long userId, Long eventId, Long commentId);
+
+    CommentDto updateComment(UpdateCommentRequest updateCommentRequest, Long userId, Long eventId, Long commentId);
+
+    void deleteCommentByAdmin(Long eventId, Long commentId);
+
+    CommentDto getCommentById(Long commentId);
 }
