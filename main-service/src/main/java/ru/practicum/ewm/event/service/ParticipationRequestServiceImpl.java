@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import ru.practicum.ewm.category.CategoryRepository;
 import ru.practicum.ewm.event.EventRepository;
 import ru.practicum.ewm.event.ParticipationRequestRepository;
 import ru.practicum.ewm.event.dto.ParticipationRequestDto;
