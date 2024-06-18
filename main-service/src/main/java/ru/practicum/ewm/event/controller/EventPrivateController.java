@@ -1,5 +1,6 @@
 package ru.practicum.ewm.event.controller;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -14,14 +15,10 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/users/{userId}/events")
 @Slf4j
+@AllArgsConstructor
 public class EventPrivateController {
     public final EventService eventService;
     public final LocationService locationService;
-
-    public EventPrivateController(EventService eventService, LocationService locationService) {
-        this.eventService = eventService;
-        this.locationService = locationService;
-    }
 
     @GetMapping
     public List<EventShortDto> listUsersEvents(@PathVariable Long userId,

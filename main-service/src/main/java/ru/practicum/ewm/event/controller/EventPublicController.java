@@ -1,5 +1,6 @@
 package ru.practicum.ewm.event.controller;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
@@ -18,12 +19,9 @@ import java.util.List;
 @RequestMapping(path = "/events")
 @Slf4j
 @Validated
+@AllArgsConstructor
 public class EventPublicController {
     public final EventService eventService;
-
-    public EventPublicController(EventService eventService) {
-        this.eventService = eventService;
-    }
 
     @GetMapping
     public List<EventShortDto> listEventsPublicFilter(

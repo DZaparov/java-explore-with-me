@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
@@ -39,20 +41,6 @@ public class EventServiceImpl implements EventService {
     private final ParticipationRequestRepository participationRequestRepository;
     private final CommentRepository commentRepository;
     public final StatsClient statsClient;
-
-    public EventServiceImpl(EventRepository eventRepository,
-                            UserRepository userRepository,
-                            CategoryRepository categoryRepository,
-                            ParticipationRequestRepository participationRequestRepository,
-                            CommentRepository commentRepository,
-                            StatsClient statsClient) {
-        this.eventRepository = eventRepository;
-        this.userRepository = userRepository;
-        this.categoryRepository = categoryRepository;
-        this.participationRequestRepository = participationRequestRepository;
-        this.commentRepository = commentRepository;
-        this.statsClient = statsClient;
-    }
 
     @Override
     public List<EventShortDto> listUsersEvents(Long userId, int from, int size) {

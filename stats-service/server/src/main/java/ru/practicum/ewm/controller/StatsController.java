@@ -1,5 +1,6 @@
 package ru.practicum.ewm.controller;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -14,12 +15,9 @@ import java.util.List;
 
 @RestController
 @Slf4j
+@AllArgsConstructor
 public class StatsController {
     public final StatsService statsService;
-
-    public StatsController(StatsService statsService) {
-        this.statsService = statsService;
-    }
 
     @PostMapping("/hit")
     @ResponseStatus(code = HttpStatus.CREATED)

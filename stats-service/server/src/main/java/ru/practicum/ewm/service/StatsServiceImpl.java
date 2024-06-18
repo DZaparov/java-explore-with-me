@@ -1,5 +1,6 @@
 package ru.practicum.ewm.service;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.EndpointHit;
 import ru.practicum.ewm.ViewStats;
@@ -12,12 +13,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class StatsServiceImpl implements StatsService {
     private final StatsRepository statsRepository;
-
-    public StatsServiceImpl(StatsRepository statsRepository) {
-        this.statsRepository = statsRepository;
-    }
 
     @Override
     public EndpointHit createHit(EndpointHit endpointHit) {

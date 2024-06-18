@@ -1,5 +1,6 @@
 package ru.practicum.ewm.event.controller;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -19,14 +20,10 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/admin/events")
 @Slf4j
+@AllArgsConstructor
 public class EventAdminController {
     public final EventService eventService;
     public final LocationService locationService;
-
-    public EventAdminController(EventService eventService, LocationService locationService) {
-        this.eventService = eventService;
-        this.locationService = locationService;
-    }
 
     @GetMapping
     public List<EventFullDto> listEventsAdminFilter(

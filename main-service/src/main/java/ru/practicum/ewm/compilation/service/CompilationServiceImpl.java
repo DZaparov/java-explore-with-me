@@ -1,5 +1,6 @@
 package ru.practicum.ewm.compilation.service;
 
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -20,14 +21,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class CompilationServiceImpl implements CompilationService {
     private final CompilationRepository compilationRepository;
     private final EventRepository eventRepository;
-
-    public CompilationServiceImpl(CompilationRepository compilationRepository, EventRepository eventRepository) {
-        this.compilationRepository = compilationRepository;
-        this.eventRepository = eventRepository;
-    }
 
     @Override
     public CompilationDto createCompilation(NewCompilationDto newCompilationDto) {
