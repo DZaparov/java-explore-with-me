@@ -1,5 +1,6 @@
 package ru.practicum.ewm.event.controller;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -12,15 +13,10 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/users/{userId}/requests")
 @Slf4j
+@AllArgsConstructor
 public class ParticipationRequestController {
     public final EventService eventService;
     public final ParticipationRequestService participationRequestService;
-
-    public ParticipationRequestController(EventService eventService,
-                                          ParticipationRequestService participationRequestService) {
-        this.eventService = eventService;
-        this.participationRequestService = participationRequestService;
-    }
 
     @GetMapping
     public List<ParticipationRequestDto> listUsersEventRequests(@PathVariable Long userId,

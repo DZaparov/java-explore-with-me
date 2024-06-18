@@ -1,5 +1,6 @@
 package ru.practicum.ewm.event.controller;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -14,14 +15,10 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/users/{userId}/events")
 @Slf4j
+@AllArgsConstructor
 public class EventPrivateController {
     public final EventService eventService;
     public final LocationService locationService;
-
-    public EventPrivateController(EventService eventService, LocationService locationService) {
-        this.eventService = eventService;
-        this.locationService = locationService;
-    }
 
     @GetMapping
     public List<EventShortDto> listUsersEvents(@PathVariable Long userId,
@@ -93,6 +90,44 @@ public class EventPrivateController {
                 eventId,
                 eventRequestStatusUpdateRequest);
         log.info("Измененное событие: {}", result);
+
+        return result;
+    }
+
+    @PostMapping("/{eventId}/comment")
+    @ResponseStatus(code = HttpStatus.CREATED) //201
+    public CommentDto addComment(@Valid @RequestBody NewCommentDto newCommentDto,
+                                 @PathVariable Long userId,
+                                 @PathVariable Long eventId) {
+        return eventService.addComment(newCommentDto, userId, eventId);
+    }
+
+    @DeleteMapping("/{eventId}/comment/{commentId}")
+    @ResponseStatus(code = HttpStatus.NO_CONTENT) //204
+    public void deleteComment(@PathVariable Long userId,
+                              @PathVariable Long eventId,
+                              @PathVariable Long commentId) {
+        eventService.deleteComment(userId, eventId, commentId);
+    }
+
+    @PatchMapping("/{eventId}/comment/{commentId}")
+    @ResponseStatus(code = HttpStatus.OK) //200
+    public CommentDto updateComment(@Valid @RequestBody UpdateCommentRequest updateCommentRequest,
+                                    @PathVariable Long userId,
+                                    @PathVariable Long eventId,
+                                    @PathVariable Long commentId) {
+        log.info("Попытка обновить комментарий с id={} на {}", commentId, updateCommentRequest);
+        CommentDto result = eventService.updateComment(updateCommentRequest, userId, eventId, commentId);
+        log.info("Обновлен комментарий: {}", result);
+
+        return result;
+    }
+
+    @GetMapping("/{eventId}/comment/{commentId}")
+    public CommentDto getCommentById(@PathVariable Long commentId) {
+        log.info("Попытка получения комментария id=: {}", commentId);
+        CommentDto result = eventService.getCommentById(commentId);
+        log.info("Комментарий получен: {}", result);
 
         return result;
     }

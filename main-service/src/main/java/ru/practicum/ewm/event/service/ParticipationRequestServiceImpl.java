@@ -1,9 +1,9 @@
 package ru.practicum.ewm.event.service;
 
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import ru.practicum.ewm.category.CategoryRepository;
 import ru.practicum.ewm.event.EventRepository;
 import ru.practicum.ewm.event.ParticipationRequestRepository;
 import ru.practicum.ewm.event.dto.ParticipationRequestDto;
@@ -22,20 +22,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class ParticipationRequestServiceImpl implements ParticipationRequestService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final ParticipationRequestRepository participationRequestRepository;
-
-
-    public ParticipationRequestServiceImpl(EventRepository eventRepository,
-                                           UserRepository userRepository,
-                                           CategoryRepository categoryRepository,
-                                           ParticipationRequestRepository participationRequestRepository) {
-        this.eventRepository = eventRepository;
-        this.userRepository = userRepository;
-        this.participationRequestRepository = participationRequestRepository;
-    }
 
     @Override
     public List<ParticipationRequestDto> listUsersEventRequests(Long userId, int from, int size) {

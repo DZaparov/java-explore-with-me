@@ -1,5 +1,6 @@
 package ru.practicum.ewm.user.controller;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -17,12 +18,9 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/admin/users")
 @Slf4j
+@AllArgsConstructor
 public class UserAdminController {
     public final UserService userService;
-
-    public UserAdminController(UserService userService) {
-        this.userService = userService;
-    }
 
     @GetMapping
     public List<UserDto> listUsers(@RequestParam(required = false) List<Long> ids,

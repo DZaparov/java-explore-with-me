@@ -1,5 +1,6 @@
 package ru.practicum.ewm.category.service;
 
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -17,14 +18,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final EventRepository eventRepository;
-
-    public CategoryServiceImpl(CategoryRepository categoryRepository, EventRepository eventRepository) {
-        this.categoryRepository = categoryRepository;
-        this.eventRepository = eventRepository;
-    }
 
     @Override
     public CategoryDto createCategory(NewCategoryDto newCategoryDto) {

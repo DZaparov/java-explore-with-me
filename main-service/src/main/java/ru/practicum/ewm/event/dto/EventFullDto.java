@@ -10,6 +10,7 @@ import ru.practicum.ewm.location.model.Location;
 import ru.practicum.ewm.user.dto.UserShortDto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -34,4 +35,5 @@ public class EventFullDto {
     private boolean paid;
     private boolean requestModeration;
     private Long views;
+    private List<CommentDto> comments;
 }
